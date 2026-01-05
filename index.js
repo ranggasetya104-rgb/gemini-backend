@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -9,15 +8,19 @@ console.log("API KEY ADA:", !!process.env.GEMINI_API_KEY);
 
 const app = express();
 
-/* === CORS HARUS DI ATAS & EKSPLISIT === */
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"]
-}));
+/* ===== CORS MANUAL (PALING STABIL DI VERCEL) ===== */
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
 
-/* === HANDLE PREFLIGHT === */
-app.options("*", cors());
+  // Handle preflight
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 app.use(express.json());
 
@@ -41,14 +44,14 @@ app.post("/api/chat", async (req, res) => {
     return res.json({ reply: response });
 
   } catch (error) {
-    console.error("ERROR GEMINI ASLI:", error);
+    console.error("ERROR GEMINI:", error);
     return res.status(500).json({
       reply: "Terjadi error saat memanggil Gemini"
     });
   }
 });
 
-/* === UNTUK TEST DI BROWSER (OPSIONAL) === */
+/* Optional test */
 app.get("/", (req, res) => {
   res.send("Backend Gemini berjalan");
 });
