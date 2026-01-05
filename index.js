@@ -4,7 +4,8 @@ import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
-console.log("API KEY ADA:", !!process.env.GEMINI_API_KEY);
+console.log("ENV KEYS:", Object.keys(process.env).filter(k => k.includes("GEMINI")));
+
 
 const app = express();
 app.use(cors());
@@ -36,3 +37,4 @@ const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server Gemini berjalan di port ${PORT}`);
 });
+
